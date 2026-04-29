@@ -3,7 +3,6 @@
 namespace BurnBright\ImportExport\BulkLoader\Sources;
 
 use ArrayIterator;
-use SilverStripe\Dev\CSVParser;
 use Goodby\CSV\Import\Standard\Lexer;
 use Goodby\CSV\Import\Standard\Interpreter;
 use Goodby\CSV\Import\Standard\LexerConfig;
@@ -81,8 +80,9 @@ class CsvBulkLoaderSource extends BulkLoaderSource
             //TODO: throw exception instead?
             return null;
         }
+
         $header = $this->hasheader ? $this->getFirstRow() : null;
-        $output = array();
+        $output = [];
 
         $config = new LexerConfig();
         $config->setDelimiter($this->delimiter);
@@ -95,14 +95,16 @@ class CsvBulkLoaderSource extends BulkLoaderSource
         $interpreter->addObserver(function (array $row) use (&$output, $header) {
             if ($header) {
                 //create new row using headings as keys
-                $newrow = array();
+                $newrow = [];
                 foreach ($header as $k => $heading) {
                     if (isset($row[$k])) {
                         $newrow[$heading] = $row[$k];
                     }
                 }
+
                 $row = $newrow;
             }
+
             $output[] = $row;
         });
 

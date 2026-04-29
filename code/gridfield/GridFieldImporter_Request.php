@@ -2,10 +2,11 @@
 
 namespace BurnBright\ImportExport\GridField;
 
+use Override;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\Form;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Convert;
-use SilverStripe\View\ArrayData;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
@@ -32,52 +33,44 @@ class GridFieldImporter_Request extends RequestHandler
     protected $gridField;
 
     /**
-     * The parent GridFieldImporter
-     * @var GridFieldImporter
-     */
-    protected $component;
-
-    /**
      * URLSegment for this request handler
      * @var string
      */
     protected $urlSegment = 'importer';
 
     /**
-     * Parent handler to link up to
-     * @var RequestHandler
-     */
-    protected $requestHandler;
-
-    /**
      * RequestHandler allowed actions
      * @var array
      */
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'preview', 'upload', 'import'
-    );
+    ];
 
     /**
      * RequestHandler url => action map
      * @var array
      */
-    private static $url_handlers = array(
+    private static $url_handlers = [
         'upload!' => 'upload',
         '$Action/$FileID' => '$Action'
-    );
+    ];
 
     /**
      * Handler's constructor
      *
      * @param GridField $gridField
      * @param GridField_URLHandler $component
-     * @param RequestHandler $handler
+     * @param RequestHandler $requestHandler
      */
-    public function __construct($gridField, $component, $handler)
+    public function __construct($gridField, /**
+     * The parent GridFieldImporter
+     */
+    protected $component, /**
+     * Parent handler to link up to
+     */
+    protected $requestHandler)
     {
         $this->gridField = $gridField;
-        $this->component = $component;
-        $this->requestHandler = $handler;
         parent::__construct();
     }
 
@@ -107,12 +100,12 @@ class GridFieldImporter_Request extends RequestHandler
         $body['import_url'] = Controller::join_links(
            $this->Link('preview'), $body['id'],
            // Also pull the back URL from the current request so we can persist this particular URL through the following pages.
-           "?BackURL=" . $this->getBackURL($request)
+           "?BackURL=" . $this->getBackURL()
         );
         //don't return buttons at all
         unset($body['buttons']);
         //re-encode
-        $response = new HTTPResponse(Convert::raw2json(array($body)));
+        $response = HTTPResponse::create(Convert::raw2json([$body]));
 
         return $response;
     }
@@ -129,8 +122,9 @@ class GridFieldImporter_Request extends RequestHandler
         if (!$file) {
             return "file not found";
         }
+
         //TODO: validate file?
-        $mapper = new CSVFieldMapper($file->getFullPath());
+        $mapper = CSVFieldMapper::create($file->getFullPath());
         $mapper->setMappableCols($this->getMappableColumns());
         //load previously stored values
         if ($cachedmapping = $this->getCachedMapping()) {
@@ -139,19 +133,19 @@ class GridFieldImporter_Request extends RequestHandler
 
         $form = $this->MapperForm();
         $form->Fields()->unshift(
-            new LiteralField('mapperfield', $mapper->forTemplate())
+            LiteralField::create('mapperfield', $mapper->forTemplate())
         );
-        $form->Fields()->push(new HiddenField("BackURL", "BackURL", $this->getBackURL($request)));
+        $form->Fields()->push(HiddenField::create("BackURL", "BackURL", $this->getBackURL()));
         $form->setFormAction($this->Link('import').'/'.$file->ID);
-        $content = ArrayData::create(array(
+        $content = ArrayData::create([
             'File' => $file,
             'MapperForm'=> $form
-        ))->renderWith('GridFieldImporter_preview');
+        ])->renderWith('GridFieldImporter_preview');
         $controller = $this->getToplevelController();
 
-        return $controller->customise(array(
+        return $controller->customise([
             'Content' => $content
-        ));
+        ]);
     }
 
     /**
@@ -161,12 +155,10 @@ class GridFieldImporter_Request extends RequestHandler
      */
     public function MapperForm()
     {
-        $fields = new FieldList(
-            CheckboxField::create("HasHeader",
-                "This data includes a header row.",
-                true
-            )
-        );
+        $fields = FieldList::create(CheckboxField::create("HasHeader",
+            "This data includes a header row.",
+            true
+        ));
         if ($this->component->getCanClearData()) {
             $fields->push(
                 CheckboxField::create("ClearData",
@@ -174,11 +166,9 @@ class GridFieldImporter_Request extends RequestHandler
                 )
             );
         }
-        $actions = new FieldList(
-            new FormAction("import", "Import CSV"),
-            new FormAction("cancel", "Cancel")
-        );
-        $form = new Form($this, __FUNCTION__, $fields, $actions);
+
+        $actions = FieldList::create(FormAction::create("import", "Import CSV"), FormAction::create("cancel", "Cancel"));
+        $form = Form::create($this, __FUNCTION__, $fields, $actions);
 
         return $form;
     }
@@ -209,6 +199,7 @@ class GridFieldImporter_Request extends RequestHandler
             if (!$file) {
                 return "file not found";
             }
+
             $colmap = Convert::raw2sql($request->postVar('mappings'));
             if ($colmap) {
                 //save mapping to cache
@@ -224,8 +215,10 @@ class GridFieldImporter_Request extends RequestHandler
                     ->sessionMessage($results->getMessage(), 'good');
             }
         }
+
         $controller = $this->getToplevelController();
         $controller->redirectBack();
+        return null;
     }
 
     /**
@@ -244,6 +237,7 @@ class GridFieldImporter_Request extends RequestHandler
             $loader->columnMap = $loader->columnMap ?
                 array_merge($loader->columnMap, $colmap) : $colmap;
         }
+
         $loader->getSource()
             ->setFilePath($filepath)
             ->setHasHeader($hasheader);
@@ -266,6 +260,7 @@ class GridFieldImporter_Request extends RequestHandler
      * @param string $action
      * @return string
      */
+    #[Override]
     public function Link($action = null)
     {
         return Controller::join_links(
@@ -283,6 +278,7 @@ class GridFieldImporter_Request extends RequestHandler
         while ($c && $c instanceof GridFieldDetailForm_ItemRequest) {
             $c = $c->getController();
         }
+
         if (!$c) {
             $c = Controller::curr();
         }
@@ -296,7 +292,7 @@ class GridFieldImporter_Request extends RequestHandler
     protected function cacheMapping($mapping)
     {
         $mapping = array_filter($mapping);
-        if ($mapping && !empty($mapping)) {
+        if ($mapping && $mapping !== []) {
             $cache = SS_Cache::factory('gridfieldimporter');
             $cache->save(serialize($mapping), $this->cacheKey());
         }
@@ -318,7 +314,7 @@ class GridFieldImporter_Request extends RequestHandler
      */
     protected function cacheKey()
     {
-        return md5($this->gridField->Link());
+        return md5((string) $this->gridField->Link());
     }
 
    /**
@@ -329,6 +325,7 @@ class GridFieldImporter_Request extends RequestHandler
     *
     * @return string
     */
+   #[Override]
    public function getBackURL() 
    {
         $request = $this->getRequest();
@@ -339,12 +336,12 @@ class GridFieldImporter_Request extends RequestHandler
             $controller->Link();
 
       // Try to parse out a back URL using standard framework technique.
-      if($request->requestVar('BackURL')) {
-         $url = $request->requestVar('BackURL');
-      } else if($request->isAjax() && $request->getHeader('X-Backurl')) {
-         $url = $request->getHeader('X-Backurl');
-      } else if($request->getHeader('Referer')) {
-         $url = $request->getHeader('Referer');
+      if ($request->requestVar('BackURL')) {
+          $url = $request->requestVar('BackURL');
+      } elseif ($request->isAjax() && $request->getHeader('X-Backurl')) {
+          $url = $request->getHeader('X-Backurl');
+      } elseif ($request->getHeader('Referer')) {
+          $url = $request->getHeader('Referer');
       }
 
       return $url;

@@ -14,7 +14,7 @@ class BetterBulkLoader_Result extends BulkLoader_Result
      * Keep track of skipped records.
      * @var array
      */
-    protected $skipped = array();
+    protected $skipped = [];
 
     /**
      * @return int
@@ -29,9 +29,9 @@ class BetterBulkLoader_Result extends BulkLoader_Result
      */
     public function addSkipped($message = null)
     {
-        $this->skipped[] = array(
+        $this->skipped[] = [
             'Message' => $message
-        );
+        ];
     }
 
     /**
@@ -40,29 +40,32 @@ class BetterBulkLoader_Result extends BulkLoader_Result
      */
     public function getMessageList()
     {
-        $output =  array();
+        $output =  [];
         if ($this->CreatedCount()) {
             $output['created'] = _t(
                 'BulkLoader.IMPORTEDRECORDS', "Imported {count} new records.",
-                array('count' => $this->CreatedCount())
+                ['count' => $this->CreatedCount()]
             );
         }
+
         if ($this->UpdatedCount()) {
             $output['updated'] = _t(
                 'BulkLoader.UPDATEDRECORDS', "Updated {count} records.",
-                array('count' => $this->UpdatedCount())
+                ['count' => $this->UpdatedCount()]
             );
         }
+
         if ($this->DeletedCount()) {
             $output['deleted'] =  _t(
                 'BulkLoader.DELETEDRECORDS', "Deleted {count} records.",
-                array('count' => $this->DeletedCount())
+                ['count' => $this->DeletedCount()]
             );
         }
+
         if ($this->SkippedCount()) {
             $output['skipped'] =  _t(
                 'BulkLoader.SKIPPEDRECORDS', "Skipped {count} bad records.",
-                array('count' => $this->SkippedCount())
+                ['count' => $this->SkippedCount()]
             );
         }
 
@@ -90,13 +93,14 @@ class BetterBulkLoader_Result extends BulkLoader_Result
     public function getMessageType()
     {
         $type = "bad";
-        if ($this->Count()) {
+        if ($this->Count() !== 0) {
             $type = "good";
         }
+
         if ($this->SkippedCount()) {
             $type= "warning";
         }
-        
+
         return $type;
     }
 }

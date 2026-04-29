@@ -4,7 +4,16 @@ use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
 use BurnBright\ImportExport\BulkLoader\Sources\ArrayBulkLoaderSource;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Dev\TestOnly;
-use SilverStripe\ORM\ArrayList;
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: SilverStripe\ORM\ArrayList
+  * NEW: ArrayList ...  (COMPLEX)
+  * EXP: Removed deprecated class SilverStripe\\ORM\\ArrayList - renamed to ArrayList. See: https://docs.silverstripe.org/en/6/changelogs/6.0.0/
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+use ArrayList;
 use SilverStripe\ORM\DataObject;
 
 class BulkLoaderRelationTest extends SapphireTest

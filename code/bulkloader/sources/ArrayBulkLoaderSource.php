@@ -11,11 +11,8 @@ use BurnBright\ImportExport\BulkLoader\Sources\BulkLoaderSource;
 class ArrayBulkLoaderSource extends BulkLoaderSource
 {
 
-    protected $data;
-
-    public function __construct($data)
+    public function __construct(protected $data)
     {
-        $this->data = $data;
     }
 
     public function getIterator()
