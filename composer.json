@@ -2,6 +2,7 @@
     "name": "burnbright/silverstripe-importexport",
     "description": "An upgrade to SilverStripe's bulk loading and exporting (forked from burnbright/silverstripe-importexport)",
     "type": "silverstripe-vendormodule",
+    "license": "BSD-3-Clause",
     "keywords": [
         "silverstripe",
         "silverstripe 4",
