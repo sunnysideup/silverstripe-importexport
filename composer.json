@@ -1,5 +1,5 @@
 {
-    "name": "burnbright/silverstripe-importexport",
+    "name": "sunnysideup/silverstripe-importexport",
     "description": "An upgrade to SilverStripe's bulk loading and exporting (forked from burnbright/silverstripe-importexport)",
     "type": "silverstripe-vendormodule",
     "keywords": [
