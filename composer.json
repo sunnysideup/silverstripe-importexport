@@ -24,8 +24,8 @@
     }
   ],
   "require": {
-    "silverstripe/cms": "^4 || ^5",
-    "silverstripe/framework": "^4 || ^5",
+    "silverstripe/cms": "^6.0",
+    "silverstripe/framework": "^6.0",
     "goodby/csv": "^1.2.0"
   },
   "extra": {
