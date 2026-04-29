@@ -2,6 +2,7 @@
 
 namespace BurnBright\ImportExport\BulkLoader;
 
+use Override;
 use SilverStripe\ORM\DataList;
 use BurnBright\ImportExport\BulkLoader\BetterBulkLoader_Result;
 use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
@@ -36,6 +37,7 @@ class ListBulkLoader extends BetterBulkLoader
      * Get the DataList of objects this loader applies to.
      * @return DataList
      */
+    #[Override]
     public function getDataList()
     {
         return $this->list;
@@ -44,10 +46,11 @@ class ListBulkLoader extends BetterBulkLoader
     /**
      * Add records to the list.
      */
+    #[Override]
     protected function processAll($filepath, $preview = false)
     {
         $iterator = $this->getSource()->getIterator();
-        $results = new BetterBulkLoader_Result();
+        $results = BetterBulkLoader_Result::create();
         foreach ($iterator as $record) {
             if ($id = $this->processRecord($record, $this->columnMap, $results, $preview)) {
                 $this->list->add($id);
@@ -60,6 +63,7 @@ class ListBulkLoader extends BetterBulkLoader
     /**
      * Override the default deleteExistingRecords method.
      */
+    #[Override]
     public function deleteExistingRecords()
     {
         foreach ($this->list as $item) {
