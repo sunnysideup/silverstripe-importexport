@@ -2,6 +2,7 @@
 
 namespace BurnBright\ImportExport\BulkLoader;
 
+use Override;
 use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
 use BurnBright\ImportExport\BulkLoader\Sources\CsvBulkLoaderSource;
 
@@ -18,6 +19,7 @@ class CsvBetterBulkLoader extends BetterBulkLoader
 
     public $hasHeaderRow = true;
 
+    #[Override]
     protected function processAll($filepath, $preview = false)
     {
         //configre a CsvBulkLoaderSource

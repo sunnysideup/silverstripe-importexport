@@ -2,6 +2,7 @@
 
 namespace BurnBright\ImportExport;
 
+use Override;
 use SilverStripe\Model\ModelData;
 use SilverStripe\Model\List\ArrayList;
 use SilverStripe\Model\ArrayData;
@@ -61,6 +62,7 @@ class CSVPreviewer extends ModelData
      * Render the previewer
      * @return string
      */
+    #[Override]
     public function forTemplate(): string
     {
         if (!$this->rows) {
@@ -72,7 +74,7 @@ class CSVPreviewer extends ModelData
 
     /**
      * Get the CSV headings for use in template
-     * @return \SilverStripe\Model\List\ArrayList
+     * @return ArrayList
      */
     public function getHeadings()
     {
@@ -94,7 +96,7 @@ class CSVPreviewer extends ModelData
 
     /**
      * Get CSV rows/cols for use in template
-     * @return \SilverStripe\Model\List\ArrayList
+     * @return ArrayList
      */
     public function getRows()
     {

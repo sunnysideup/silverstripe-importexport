@@ -2,6 +2,7 @@
 
 namespace BurnBright\ImportExport\BulkLoader;
 
+use Override;
 use SilverStripe\Core\Validation\ValidationException;
 use SilverStripe\Dev\BulkLoader;
 use SilverStripe\ORM\DataObject;
@@ -124,6 +125,7 @@ class BetterBulkLoader extends BulkLoader
         return $this;
     }
 
+    #[Override]
     public function load($filepath = null)
     {
         if ($this->deleteExistingRecords) {

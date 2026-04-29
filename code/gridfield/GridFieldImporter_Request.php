@@ -2,6 +2,7 @@
 
 namespace BurnBright\ImportExport\GridField;
 
+use Override;
 use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\Form;
 use SilverStripe\Assets\File;
@@ -259,6 +260,7 @@ class GridFieldImporter_Request extends RequestHandler
      * @param string $action
      * @return string
      */
+    #[Override]
     public function Link($action = null)
     {
         return Controller::join_links(
@@ -323,6 +325,7 @@ class GridFieldImporter_Request extends RequestHandler
     *
     * @return string
     */
+   #[Override]
    public function getBackURL() 
    {
         $request = $this->getRequest();

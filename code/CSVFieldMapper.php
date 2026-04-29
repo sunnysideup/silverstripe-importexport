@@ -36,7 +36,7 @@ class CSVFieldMapper extends CSVPreviewer
     
     /**
      * Provide heading dropdowns for creating mappings
-     * @return \SilverStripe\Model\List\ArrayList
+     * @return ArrayList
      */
     public function getMapHeadings()
     {
