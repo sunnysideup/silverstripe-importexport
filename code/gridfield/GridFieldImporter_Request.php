@@ -2,10 +2,10 @@
 
 namespace BurnBright\ImportExport\GridField;
 
+use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\Form;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Convert;
-use SilverStripe\View\ArrayData;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;

@@ -2,9 +2,9 @@
 
 namespace BurnBright\ImportExport\BulkLoader;
 
+use SilverStripe\Core\Validation\ValidationException;
 use SilverStripe\Dev\BulkLoader;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\ValidationException;
 use BurnBright\ImportExport\BulkLoader\BetterBulkLoader_Result;
 use BurnBright\ImportExport\BulkLoader\Sources\BulkLoaderSource;
 

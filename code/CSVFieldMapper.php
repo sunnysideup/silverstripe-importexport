@@ -2,8 +2,8 @@
 
 namespace BurnBright\ImportExport;
 
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\DropdownField;
 use BurnBright\ImportExport\CSVPreviewer;
 
@@ -36,7 +36,7 @@ class CSVFieldMapper extends CSVPreviewer
     
     /**
      * Provide heading dropdowns for creating mappings
-     * @return ArrayList
+     * @return \SilverStripe\Model\List\ArrayList
      */
     public function getMapHeadings()
     {
