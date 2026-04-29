@@ -1,5 +1,4 @@
 {
-<<<<<<< upgrades/automatedbranch/5to6
   "name": "sunnysideup/silverstripe-importexport",
   "description": "An upgrade to SilverStripe's bulk loading and exporting (forked from burnbright/silverstripe-importexport)",
   "type": "silverstripe-vendormodule",
@@ -18,36 +17,6 @@
     {
       "name": "Jeremy Shipman",
       "email": "jeremy@burnbright.net"
-=======
-    "name": "sunnysideup/silverstripe-importexport",
-    "description": "An upgrade to SilverStripe's bulk loading and exporting (forked from burnbright/silverstripe-importexport)",
-    "type": "silverstripe-vendormodule",
-    "license": "BSD-3-Clause",
-    "keywords": [
-        "silverstripe",
-        "silverstripe 4",
-        "csv bulkloader",
-        "csv",
-        "import",
-        "bulkload",
-        "export",
-        "data"
-    ],
-    "authors": [
-        {
-            "name": "Jeremy Shipman",
-            "email": "jeremy@burnbright.net"
-        },
-        {
-            "name": "Jeremy Cole",
-            "email": "jeremy@psdigital.co.nz"
-        }
-    ],
-    "require": {
-        "silverstripe/cms": "^4 || ^5",
-        "silverstripe/framework": "^4 || ^5",
-        "goodby/csv": "1.2.x"
->>>>>>> main
     },
     {
       "name": "Jeremy Cole",
