@@ -1,0 +1,272 @@
+diff --git a/code/CSVFieldMapper.php b/code/CSVFieldMapper.php
+index 912a40f..0bae407 100644
+--- a/code/CSVFieldMapper.php
++++ b/code/CSVFieldMapper.php
+@@ -2,8 +2,8 @@
+ 
+ namespace BurnBright\ImportExport;
+ 
+-use SilverStripe\ORM\ArrayList;
+-use SilverStripe\View\ArrayData;
++use SilverStripe\Model\List\ArrayList;
++use SilverStripe\Model\ArrayData;
+ use SilverStripe\Forms\DropdownField;
+ use BurnBright\ImportExport\CSVPreviewer;
+ 
+diff --git a/code/CSVPreviewer.php b/code/CSVPreviewer.php
+index a9d3fc8..5773d56 100644
+--- a/code/CSVPreviewer.php
++++ b/code/CSVPreviewer.php
+@@ -2,14 +2,15 @@
+ 
+ namespace BurnBright\ImportExport;
+ 
++use Override;
++use SilverStripe\Model\ModelData;
++use SilverStripe\Model\List\ArrayList;
++use SilverStripe\Model\ArrayData;
+ use SilverStripe\Dev\CSVParser;
+-use SilverStripe\ORM\ArrayList;
+-use SilverStripe\View\ArrayData;
+-use SilverStripe\View\ViewableData;
+ /**
+  * View the content of a given CSV file
+  */
+-class CSVPreviewer extends ViewableData
++class CSVPreviewer extends ModelData
+ {
+ 
+     protected $headings;
+@@ -61,7 +62,8 @@ class CSVPreviewer extends ViewableData
+      * Render the previewer
+      * @return string
+      */
+-    public function forTemplate()
++    #[Override]
++    public function forTemplate(): string
+     {
+         if (!$this->rows) {
+             $this->loadCSV();
+diff --git a/code/bulkloader/BetterBulkLoader.php b/code/bulkloader/BetterBulkLoader.php
+index b085a82..bc22752 100644
+--- a/code/bulkloader/BetterBulkLoader.php
++++ b/code/bulkloader/BetterBulkLoader.php
+@@ -2,9 +2,10 @@
+ 
+ namespace BurnBright\ImportExport\BulkLoader;
+ 
++use Override;
++use SilverStripe\Core\Validation\ValidationException;
+ use SilverStripe\Dev\BulkLoader;
+ use SilverStripe\ORM\DataObject;
+-use SilverStripe\ORM\ValidationException;
+ use BurnBright\ImportExport\BulkLoader\BetterBulkLoader_Result;
+ use BurnBright\ImportExport\BulkLoader\Sources\BulkLoaderSource;
+ 
+@@ -124,6 +125,7 @@ class BetterBulkLoader extends BulkLoader
+         return $this;
+     }
+ 
++    #[Override]
+     public function load($filepath = null)
+     {
+         if ($this->deleteExistingRecords) {
+diff --git a/code/bulkloader/CsvBetterBulkLoader.php b/code/bulkloader/CsvBetterBulkLoader.php
+index 08307e8..9768a10 100644
+--- a/code/bulkloader/CsvBetterBulkLoader.php
++++ b/code/bulkloader/CsvBetterBulkLoader.php
+@@ -2,6 +2,7 @@
+ 
+ namespace BurnBright\ImportExport\BulkLoader;
+ 
++use Override;
+ use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
+ use BurnBright\ImportExport\BulkLoader\Sources\CsvBulkLoaderSource;
+ 
+@@ -18,6 +19,7 @@ class CsvBetterBulkLoader extends BetterBulkLoader
+ 
+     public $hasHeaderRow = true;
+ 
++    #[Override]
+     protected function processAll($filepath, $preview = false)
+     {
+         //configre a CsvBulkLoaderSource
+diff --git a/code/bulkloader/ListBulkLoader.php b/code/bulkloader/ListBulkLoader.php
+index 800261a..b798e3a 100644
+--- a/code/bulkloader/ListBulkLoader.php
++++ b/code/bulkloader/ListBulkLoader.php
+@@ -2,6 +2,7 @@
+ 
+ namespace BurnBright\ImportExport\BulkLoader;
+ 
++use Override;
+ use SilverStripe\ORM\DataList;
+ use BurnBright\ImportExport\BulkLoader\BetterBulkLoader_Result;
+ use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
+@@ -36,6 +37,7 @@ class ListBulkLoader extends BetterBulkLoader
+      * Get the DataList of objects this loader applies to.
+      * @return DataList
+      */
++    #[Override]
+     public function getDataList()
+     {
+         return $this->list;
+@@ -44,6 +46,7 @@ class ListBulkLoader extends BetterBulkLoader
+     /**
+      * Add records to the list.
+      */
++    #[Override]
+     protected function processAll($filepath, $preview = false)
+     {
+         $iterator = $this->getSource()->getIterator();
+@@ -60,6 +63,7 @@ class ListBulkLoader extends BetterBulkLoader
+     /**
+      * Override the default deleteExistingRecords method.
+      */
++    #[Override]
+     public function deleteExistingRecords()
+     {
+         foreach ($this->list as $item) {
+diff --git a/code/gridfield/GridFieldImporter.php b/code/gridfield/GridFieldImporter.php
+index 8c124d1..03c62bb 100644
+--- a/code/gridfield/GridFieldImporter.php
++++ b/code/gridfield/GridFieldImporter.php
+@@ -2,7 +2,7 @@
+ 
+ namespace BurnBright\ImportExport\GridField;
+ 
+-use SilverStripe\View\ArrayData;
++use SilverStripe\Model\ArrayData;
+ use SilverStripe\ORM\HasManyList;
+ use SilverStripe\View\Requirements;
+ use SilverStripe\Forms\GridField\GridField;
+diff --git a/code/gridfield/GridFieldImporter_Request.php b/code/gridfield/GridFieldImporter_Request.php
+index 90948e1..43f3827 100644
+--- a/code/gridfield/GridFieldImporter_Request.php
++++ b/code/gridfield/GridFieldImporter_Request.php
+@@ -2,10 +2,11 @@
+ 
+ namespace BurnBright\ImportExport\GridField;
+ 
++use Override;
++use SilverStripe\Model\ArrayData;
+ use SilverStripe\Forms\Form;
+ use SilverStripe\Assets\File;
+ use SilverStripe\Core\Convert;
+-use SilverStripe\View\ArrayData;
+ use SilverStripe\Forms\FieldList;
+ use SilverStripe\Forms\FormAction;
+ use SilverStripe\Forms\HiddenField;
+@@ -259,6 +260,7 @@ class GridFieldImporter_Request extends RequestHandler
+      * @param string $action
+      * @return string
+      */
++    #[Override]
+     public function Link($action = null)
+     {
+         return Controller::join_links(
+@@ -323,6 +325,7 @@ class GridFieldImporter_Request extends RequestHandler
+     *
+     * @return string
+     */
++   #[Override]
+    public function getBackURL() 
+    {
+         $request = $this->getRequest();
+diff --git a/composer.json b/composer.json
+index f4498cb..93396ad 100644
+--- a/composer.json
++++ b/composer.json
+@@ -1,37 +1,37 @@
+ {
+-    "name": "sunnysideup/silverstripe-importexport",
+-    "description": "An upgrade to SilverStripe's bulk loading and exporting (forked from burnbright/silverstripe-importexport)",
+-    "type": "silverstripe-vendormodule",
+-    "license": "BSD-3-Clause",
+-    "keywords": [
+-        "silverstripe",
+-        "silverstripe 4",
+-        "csv bulkloader",
+-        "csv",
+-        "import",
+-        "bulkload",
+-        "export",
+-        "data"
+-    ],
+-    "authors": [
+-        {
+-            "name": "Jeremy Shipman",
+-            "email": "jeremy@burnbright.net"
+-        },
+-        {
+-            "name": "Jeremy Cole",
+-            "email": "jeremy@psdigital.co.nz"
+-        }
+-    ],
+-    "require": {
+-        "silverstripe/cms": "^4 || ^5",
+-        "silverstripe/framework": "^4 || ^5",
+-        "goodby/csv": "1.2.x"
++  "name": "sunnysideup/silverstripe-importexport",
++  "description": "An upgrade to SilverStripe's bulk loading and exporting (forked from burnbright/silverstripe-importexport)",
++  "type": "silverstripe-vendormodule",
++  "license": "BSD-3-Clause",
++  "keywords": [
++    "silverstripe",
++    "silverstripe 4",
++    "csv bulkloader",
++    "csv",
++    "import",
++    "bulkload",
++    "export",
++    "data"
++  ],
++  "authors": [
++    {
++      "name": "Jeremy Shipman",
++      "email": "jeremy@burnbright.net"
+     },
+-    "extra": {
+-        "installer-name": "importexport",
+-        "expose": [
+-            "javascript"
+-        ]
++    {
++      "name": "Jeremy Cole",
++      "email": "jeremy@psdigital.co.nz"
+     }
++  ],
++  "require": {
++    "silverstripe/cms": "^6.0",
++    "silverstripe/framework": "^6.0",
++    "goodby/csv": "^1.2.0"
++  },
++  "extra": {
++    "installer-name": "importexport",
++    "expose": [
++      "javascript"
++    ]
++  }
+ }
+diff --git a/tests/BulkLoaderRelationTest.php b/tests/BulkLoaderRelationTest.php
+index 71c50f2..2591a44 100644
+--- a/tests/BulkLoaderRelationTest.php
++++ b/tests/BulkLoaderRelationTest.php
+@@ -4,7 +4,16 @@ use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
+ use BurnBright\ImportExport\BulkLoader\Sources\ArrayBulkLoaderSource;
+ use SilverStripe\Dev\SapphireTest;
+ use SilverStripe\Dev\TestOnly;
+-use SilverStripe\ORM\ArrayList;
++
++/**
++  * ### @@@@ START REPLACEMENT @@@@ ###
++  * WHY: automated upgrade
++  * OLD: SilverStripe\ORM\ArrayList
++  * NEW: ArrayList ...  (COMPLEX)
++  * EXP: Removed deprecated class SilverStripe\\ORM\\ArrayList - renamed to ArrayList. See: https://docs.silverstripe.org/en/6/changelogs/6.0.0/
++  * ### @@@@ STOP REPLACEMENT @@@@ ###
++  */
++use ArrayList;
+ use SilverStripe\ORM\DataObject;
+ 
+ class BulkLoaderRelationTest extends SapphireTest
