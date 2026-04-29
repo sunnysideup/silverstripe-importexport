@@ -29,7 +29,6 @@
     "goodby/csv": "^1.2.0"
   },
   "extra": {
-    "installer-name": "importexport",
     "expose": [
       "javascript"
     ]
