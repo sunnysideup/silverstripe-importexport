@@ -1,8 +1,13 @@
 <?php
 
-use Goodby\CSV\Import\Standard\Interpreter;
+namespace BurnBright\ImportExport\BulkLoader\Sources;
+
+use ArrayIterator;
+use SilverStripe\Dev\CSVParser;
 use Goodby\CSV\Import\Standard\Lexer;
+use Goodby\CSV\Import\Standard\Interpreter;
 use Goodby\CSV\Import\Standard\LexerConfig;
+use BurnBright\ImportExport\BulkLoader\Sources\BulkLoaderSource;
 
 /**
  * CSV file bulk loading source

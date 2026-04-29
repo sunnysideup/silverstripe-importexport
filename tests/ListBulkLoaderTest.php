@@ -1,5 +1,11 @@
 <?php
 
+use BurnBright\ImportExport\BulkLoader\ListBulkLoader;
+use BurnBright\ImportExport\BulkLoader\Sources\ArrayBulkLoaderSource;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+
 class ListBulkLoaderTest extends SapphireTest
 {
 

@@ -1,5 +1,8 @@
 <?php
 
+use BurnBright\ImportExport\BulkLoader\Sources\ArrayBulkLoaderSource;
+use SilverStripe\Dev\SapphireTest;
+
 class ArrayBulkLoaderSourceTest extends SapphireTest
 {
     

@@ -1,5 +1,12 @@
 <?php
 
+namespace BurnBright\ImportExport\BulkLoader\Extensions;
+
+use SilverStripe\Core\Extension;
+use SilverStripe\Security\Member;
+use SilverStripe\Core\Config\Config;
+use BurnBright\ImportExport\BulkLoader\GridField\GridFieldImporter;
+
 class ImportAdminExtension extends Extension
 {
     

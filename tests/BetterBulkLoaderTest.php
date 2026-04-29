@@ -1,5 +1,12 @@
 <?php
 
+use BurnBright\ImportExport\BulkLoader\CsvBetterBulkLoader;
+use SilverStripe\Dev\CsvBulkLoader;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
+
 /**
  * @package framework
  * @subpackage tests
@@ -314,7 +321,7 @@ class BetterBulkLoaderTest_Player extends DataObject implements TestOnly
         'Contract' => 'BetterBulkLoaderTest_PlayerContract'
     );
 
-    protected function validate()
+    public function validate()
     {
         $result = parent::validate();
         if (!$this->FirstName) {

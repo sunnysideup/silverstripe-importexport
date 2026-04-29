@@ -1,5 +1,9 @@
 <?php
 
+namespace BurnBright\ImportExport\BulkLoader\Sources;
+
+use BurnBright\ImportExport\BulkLoader\Sources\BulkLoaderSource;
+
 /**
  * Array Bulk Loader Source
  * Useful for testing bulk loader. The output is the same as input.

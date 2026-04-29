@@ -1,5 +1,19 @@
 <?php
 
+namespace BurnBright\ImportExport\GridField;
+
+use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\HasManyList;
+use SilverStripe\View\Requirements;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Forms\GridField\GridField_FormAction;
+use SilverStripe\Forms\GridField\GridField_URLHandler;
+use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
+use SilverStripe\Forms\GridField\GridField_HTMLProvider;
+use BurnBright\ImportExport\GridField\GridFieldImporter_Request;
+use BurnBright\ImportExport\BulkLoader\Sources\CsvBulkLoaderSource;
+
 /**
  * Adds a way to import data to the GridField's DataList
  */
@@ -109,7 +123,7 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
         );
         $importerHTML = ArrayData::create($data)
                     ->renderWith("GridFieldImporter");
-        Requirements::javascript('importexport/javascript/GridFieldImporter.js');
+        Requirements::javascript('burnbright/silverstripe-importexport: javascript/GridFieldImporter.js');
 
         return array(
             $this->targetFragment => $importerHTML
@@ -128,13 +142,13 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
                 $gridField->Name."_ImportUploadField", 'Upload CSV'
             )
             ->setForm($gridField->getForm())
-            ->setConfig('url', $gridField->Link('importer/upload'))
-            ->setConfig('edit_url', $gridField->Link('importer/import'))
-            ->setConfig('allowedMaxFileNumber', 1)
-            ->setConfig('changeDetection', false)
-            ->setConfig('canPreviewFolder', false)
-            ->setConfig('canAttachExisting', false)
-            ->setConfig('overwriteWarning', false)
+            ->setAttribute('url', $gridField->Link('importer/upload'))
+            ->setAttribute('edit_url', $gridField->Link('importer/import'))
+            ->setAttribute('allowedMaxFileNumber', 1)
+            ->setAttribute('changeDetection', false)
+            ->setAttribute('canPreviewFolder', false)
+            ->setAttribute('canAttachExisting', false)
+            ->setAttribute('overwriteWarning', false)
             ->setAllowedExtensions(array('csv'))
             ->setFolderName('csvImports') //TODO: don't store temp CSV in assets
             ->addExtraClass("import-upload-csv-field");

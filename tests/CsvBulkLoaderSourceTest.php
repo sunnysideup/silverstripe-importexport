@@ -1,5 +1,8 @@
 <?php
 
+use BurnBright\ImportExport\BulkLoader\Sources\CsvBulkLoaderSource;
+use SilverStripe\Dev\SapphireTest;
+
 class CsvBulkLoaderSourceTest extends SapphireTest
 {
 

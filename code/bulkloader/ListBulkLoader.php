@@ -1,5 +1,11 @@
 <?php
 
+namespace BurnBright\ImportExport\BulkLoader;
+
+use SilverStripe\ORM\DataList;
+use BurnBright\ImportExport\BulkLoader\BetterBulkLoader_Result;
+use BurnBright\ImportExport\BulkLoader\BetterBulkLoader;
+
 /**
  * Peforms bulk loading, but works with a given DataList.
  */

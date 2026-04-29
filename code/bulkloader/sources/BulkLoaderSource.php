@@ -1,5 +1,9 @@
 <?php
 
+namespace BurnBright\ImportExport\BulkLoader\Sources;
+
+use IteratorAggregate;
+
 /**
  * An abstract source to bulk load records from.
  * Provides an iterator for retrieving records from.
@@ -14,5 +18,6 @@ abstract class BulkLoaderSource implements IteratorAggregate
      * Records are expected to be 1 dimensional key-value arrays.
      * @return Iterator
      */
+    #[\ReturnTypeWillChange]
     abstract public function getIterator();
 }

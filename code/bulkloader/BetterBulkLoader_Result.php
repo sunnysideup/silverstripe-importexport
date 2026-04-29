@@ -1,5 +1,9 @@
 <?php
 
+namespace BurnBright\ImportExport\BulkLoader;
+
+use SilverStripe\Dev\BulkLoader_Result;
+
 /**
  * Store result information about a BulkLoader import.
  */

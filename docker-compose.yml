@@ -1,0 +1,70 @@
+version: "3.8"
+services:
+  web:
+    image: joeplastic/silverstripe-base:7.4-apache
+    working_dir: /var/www/html
+    volumes:
+      - type: bind
+        source: ./
+        target: /var/www/html
+      - ~/.ssh:/tmp/.ssh:ro
+    ports:
+      - "80:80"
+    environment:
+      - VIRTUAL_HOST=localhost
+      - DOCUMENT_ROOT=/var/www/html/public
+      - SS_TRUSTED_PROXY_IPS=*
+      - SS_ENVIRONMENT_TYPE=dev
+      - SS_DATABASE_SERVER=database
+      - SS_DATABASE_NAME=importexport
+      - SS_DATABASE_USERNAME=root
+      - SS_DATABASE_PASSWORD=
+      - SS_DATABASE_CHOOSE_NAME=true
+      - SS_DEFAULT_ADMIN_USERNAME=admin
+      - SS_DEFAULT_ADMIN_PASSWORD=password
+      - SS_BASE_URL=http://localhost
+      - SS_ERROR_LOG=error.log
+      - BEHAT_SCREEN_SIZE=1200x900
+      #- NODE_VERSION=6.14.4
+    networks:
+      - example
+    depends_on:
+      - database
+
+  database:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - example
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: database
+      UPLOAD_LIMIT: 3000000000
+    networks:
+      - example
+    depends_on:
+      - database
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    networks:
+      - example
+    ports:
+      - "1025:1025" # smtp server
+      - "8025:8025" # web ui
+
+volumes:
+  db-data:
+
+networks:
+  example:
