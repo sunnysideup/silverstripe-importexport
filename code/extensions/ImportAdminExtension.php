@@ -28,7 +28,7 @@ class ImportAdminExtension extends Extension
     public function updateEditForm($form)
     {
         if ($doadd = Config::inst()->get('ModelAdmin', 'addbetterimporters')) {
-            $modelclass = $this->owner->modelClass;
+            $modelclass = $this->getOwner()->modelClass;
             $grid = $form->Fields()->fieldByName($modelclass);
             $config =  $grid->getConfig();
 
@@ -36,12 +36,14 @@ class ImportAdminExtension extends Extension
             if ($config->getComponentByType("GridFieldImporter")) {
                 return;
             }
+
             //don't proceed if can't create
             if (!singleton($modelclass)->canCreate(Member::currentUser())) {
                 return;
             }
+
             //allow config to avoid adding when there are existing importers
-            $importerClasses = $this->owner->stat('model_importers');
+            $importerClasses = $this->getOwner()->stat('model_importers');
             if (
                 $doadd === "scaffolded" &&
                 !is_null($importerClasses) &&
@@ -49,7 +51,7 @@ class ImportAdminExtension extends Extension
             ) {
                 return;
             }
-            
+
             //add the component
             $config->addComponent(new GridFieldImporter('before'));
         }

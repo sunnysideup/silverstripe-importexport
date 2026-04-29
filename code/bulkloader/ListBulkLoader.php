@@ -47,7 +47,7 @@ class ListBulkLoader extends BetterBulkLoader
     protected function processAll($filepath, $preview = false)
     {
         $iterator = $this->getSource()->getIterator();
-        $results = new BetterBulkLoader_Result();
+        $results = BetterBulkLoader_Result::create();
         foreach ($iterator as $record) {
             if ($id = $this->processRecord($record, $this->columnMap, $results, $preview)) {
                 $this->list->add($id);

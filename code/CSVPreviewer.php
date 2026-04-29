@@ -12,17 +12,14 @@ use SilverStripe\View\ViewableData;
 class CSVPreviewer extends ViewableData
 {
 
-    protected $file;
-
     protected $headings;
 
     protected $rows;
 
     protected $previewcount = 5;
 
-    public function __construct($file)
+    public function __construct(protected $file)
     {
-        $this->file = $file;
     }
 
     /**
@@ -49,6 +46,7 @@ class CSVPreviewer extends ViewableData
                 break;
             }
         }
+
         $firstrow = array_keys($this->rows[0]);
 
         //hack to include first row as a
@@ -68,6 +66,7 @@ class CSVPreviewer extends ViewableData
         if (!$this->rows) {
             $this->loadCSV();
         }
+
         return $this->renderWith("CSVPreviewer");
     }
 
@@ -78,16 +77,18 @@ class CSVPreviewer extends ViewableData
     public function getHeadings()
     {
         if (!$this->headings) {
-            return;
+            return null;
         }
-        $out = new ArrayList();
+
+        $out = ArrayList::create();
         foreach ($this->headings as $heading) {
             $out->push(
-                new ArrayData(array(
+                ArrayData::create([
                     "Label" => $heading
-                ))
+                ])
             );
         }
+
         return $out;
     }
 
@@ -97,23 +98,25 @@ class CSVPreviewer extends ViewableData
      */
     public function getRows()
     {
-        $out = new ArrayList();
+        $out = ArrayList::create();
         foreach ($this->rows as $row) {
-            $columns = new ArrayList();
+            $columns = ArrayList::create();
             foreach ($row as $column => $value) {
                 $columns->push(
-                    new ArrayData(array(
+                    ArrayData::create([
                         "Heading"=> $column,
                         "Value" => $value
-                    ))
+                    ])
                 );
             }
+
             $out->push(
-                new ArrayData(array(
+                ArrayData::create([
                     "Columns" => $columns
-                ))
+                ])
             );
         }
+
         return $out;
     }
 }

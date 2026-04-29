@@ -26,13 +26,13 @@ class BetterBulkLoader extends BulkLoader
      * that can be mapped to.
      * Can include dot notations.
      */
-    public $mappableFields = array();
+    public $mappableFields = [];
 
     /**
      * Transformation and relation handling
      * @var array
      */
-    public $transforms = array();
+    public $transforms = [];
 
     /**
      * Specify a colsure to be run on every imported record.
@@ -129,6 +129,7 @@ class BetterBulkLoader extends BulkLoader
         if ($this->deleteExistingRecords) {
             $this->deleteExistingRecords();
         }
+
         $this->mappableFields_cache = $this->getMappableColumns();
 
         return $this->processAll($filepath);
@@ -181,12 +182,13 @@ class BetterBulkLoader extends BulkLoader
                 E_USER_WARNING
             );
         }
-        $results = new BetterBulkLoader_Result();
+
+        $results = BetterBulkLoader_Result::create();
         $iterator = $this->getSource()->getIterator();
         foreach ($iterator as $record) {
             $this->processRecord($record, $this->columnMap, $results, $preview);
         }
-        
+
         return $results;
     }
 
@@ -195,10 +197,11 @@ class BetterBulkLoader extends BulkLoader
      */
     protected function processRecord($record, $columnMap, &$results, $preview = false)
     {
-        if (!is_array($record) || empty($record) || !array_filter($record)) {
+        if (!is_array($record) || $record === [] || !array_filter($record)) {
             $results->addSkipped("Empty/invalid record data.");
             return;
         }
+
         //map incoming record according to the standardisation mapping (columnMap)
         $record = $this->columnMapRecord($record);
         //skip if required data is not present
@@ -206,6 +209,7 @@ class BetterBulkLoader extends BulkLoader
             $results->addSkipped("Required data is missing.");
             return;
         }
+
         $modelClass = $this->objectClass;
         $placeholder = new $modelClass();
 
@@ -215,17 +219,20 @@ class BetterBulkLoader extends BulkLoader
             if (!isset($record[$field]) || empty($record[$field])) {
                 continue;
             }
+
             $this->transformField($placeholder, $field, $record[$field]);
         }
+
         //find existing duplicate of placeholder data
         $obj = null;
         $existing = null;
-        if (!$placeholder->ID && !empty($this->duplicateChecks)) {
+        if (!$placeholder->ID && $this->duplicateChecks !== []) {
             $data = $placeholder->getQueriedDatabaseFields();
             //don't match on ID, ClassName or RecordClassName
             unset($data['ID'], $data['ClassName'], $data['RecordClassName']);
             $existing = $this->findExistingObject($data);
         }
+
         if ($existing) {
             $obj = $existing;
             $obj->update($data);
@@ -235,6 +242,7 @@ class BetterBulkLoader extends BulkLoader
                 $results->addSkipped('New record not added');
                 return;
             }
+
             $obj = $placeholder;
         }
 
@@ -265,8 +273,8 @@ class BetterBulkLoader extends BulkLoader
             } else {
                 $results->addCreated($obj);
             }
-        } catch (ValidationException $e) {
-            $results->addSkipped($e->getMessage());
+        } catch (ValidationException $validationException) {
+            $results->addSkipped($validationException->getMessage());
         }
 
         $objID = $obj->ID;
@@ -274,7 +282,7 @@ class BetterBulkLoader extends BulkLoader
         $obj->destroy();
         unset($existingObj);
         unset($obj);
-        
+
         return $objID;
     }
 
@@ -285,7 +293,7 @@ class BetterBulkLoader extends BulkLoader
     protected function columnMapRecord($record)
     {
         $adjustedmap = $this->columnMap;
-        $newrecord = array();
+        $newrecord = [];
         foreach ($record as $field => $value) {
             if (isset($adjustedmap[$field])) {
                 $newrecord[$adjustedmap[$field]] = $value;
@@ -304,9 +312,10 @@ class BetterBulkLoader extends BulkLoader
      */
     protected function hasRequiredData($mappedrecord)
     {
-        if (!is_array($mappedrecord) || empty($mappedrecord) || !array_filter($mappedrecord)) {
+        if (!is_array($mappedrecord) || $mappedrecord === [] || !array_filter($mappedrecord)) {
             return false;
         }
+
         foreach ($this->transforms as $field => $t) {
             if (
                 is_array($t) &&
@@ -318,7 +327,7 @@ class BetterBulkLoader extends BulkLoader
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -339,11 +348,12 @@ class BetterBulkLoader extends BulkLoader
             $relationName = null;
             $columnName = null;
             //extract relationName and columnName, if present
-            if (strpos($field, '.') !== false) {
-                list($relationName, $columnName) = explode('.', $field);
+            if (str_contains($field, '.')) {
+                [$relationName, $columnName] = explode('.', $field);
             } else {
                 $relationName = $field;
             }
+
             //get the list that relation is added to/checked on
             $relationlist = isset($this->transforms[$field]['list']) &&
                             $this->transforms[$field]['list'] instanceof SS_List ?
@@ -373,6 +383,7 @@ class BetterBulkLoader extends BulkLoader
                     if (!$relation) {
                         $relation = $placeholder->{$relationName}();
                     }
+
                     //set data on relation
                     $relation->{$columnName} = $value;
                 }
@@ -389,6 +400,7 @@ class BetterBulkLoader extends BulkLoader
             if (!$linkexisting && $relation && $relation->isInDB()) {
                 $relation = null;
             }
+
             //fail validation gracefully
             try {
                 //write relation object, if configured
@@ -399,13 +411,15 @@ class BetterBulkLoader extends BulkLoader
                 elseif ($relation && $relation->isInDB() && $relation->isChanged()) {
                     $relation->write();
                 }
+
                 //add relation to relationlist, if it exists
                 if ($relationlist && !$relationlist->byID($relation->ID)) {
                     $relationlist->add($relation);
                 }
-            } catch (ValidationException $e) {
+            } catch (ValidationException) {
                 $relation = null;
             }
+
             //add the relation id to the placeholder
             if ($relationName && $relation && $relation->exists()) {
                 $placeholder->{$relationName."ID"} = $relation->ID;
@@ -415,13 +429,14 @@ class BetterBulkLoader extends BulkLoader
         else {
             //transform field value via callback
             //(callback can also update placeholder directly)
-            if ($callback) {
+            if ($callback !== null) {
                 $value = $callback($value, $placeholder);
             }
+
             //set field value
-            $placeholder->update(array(
+            $placeholder->update([
                 $field => $value
-            ));
+            ]);
         }
     }
 
@@ -433,9 +448,10 @@ class BetterBulkLoader extends BulkLoader
     protected function isRelation($field)
     {
         //get relation name from dot notation
-        if (strpos($field, '.') !== false) {
-            list($field, $columnName) = explode('.', $field);
+        if (str_contains($field, '.')) {
+            [$field, $columnName] = explode('.', $field);
         }
+
         $has_ones = singleton($this->objectClass)->has_one();
         //check if relation is present in has ones
         return isset($has_ones[$field]);
@@ -453,8 +469,9 @@ class BetterBulkLoader extends BulkLoader
         if (isset($this->relationCallbacks[$recordField])) {
             $relationName = $this->relationCallbacks[$recordField]['relationname'];
         }
-        if (strpos($recordField, '.') !== false) {
-            list($relationName, $columnName) = explode('.', $recordField);
+
+        if (str_contains((string) $recordField, '.')) {
+            [$relationName, $columnName] = explode('.', (string) $recordField);
         }
 
         return $relationName;
@@ -475,16 +492,18 @@ class BetterBulkLoader extends BulkLoader
             if (is_string($duplicateCheck)) {
                 $fieldName = $duplicateCheck;
                 //If the dupilcate check is a dot notation, then convert to ID relation
-                if (strpos($duplicateCheck, '.') !== false) {
-                    list($relationName, $columnName) = explode('.', $duplicateCheck);
+                if (str_contains($duplicateCheck, '.')) {
+                    [$relationName, $columnName] = explode('.', $duplicateCheck);
                     $fieldName = $relationName."ID";
                 }
+
                 //TODO: also convert plain relation names to include ID
 
                 //skip current duplicate check if field value is empty
                 if (!isset($record[$fieldName]) || empty($record[$fieldName])) {
                     continue;
                 }
+
                 $existingRecord = $this->getDataList()
                                     ->filter($fieldName, $record[$fieldName])
                                     ->first();
@@ -521,12 +540,14 @@ class BetterBulkLoader extends BulkLoader
         if (!empty($this->mappableFields)) {
             return $this->mappableFields;
         }
+
         $scaffolded = $this->scaffoldMappableFields();
-        if (!empty($this->transforms)) {
+        if ($this->transforms !== []) {
             $transformables = array_keys($this->transforms);
             $transformables = array_combine($transformables, $transformables);
             $scaffolded = array_merge($transformables, $scaffolded);
         }
+
         natcasesort($scaffolded);
 
         return $scaffolded;
@@ -541,14 +562,12 @@ class BetterBulkLoader extends BulkLoader
     {
         $map = $this->getMappableFieldsForClass($this->objectClass);
         //set up 'dot notation' (Relation.Field) style mappings
-        if ($includerelations) {
-            if ($has_ones = singleton($this->objectClass)->has_one()) {
-                foreach ($has_ones as $relationship => $type) {
-                    $fields = $this->getMappableFieldsForClass($type);
-                    foreach ($fields as $field => $title) {
-                        $map[$relationship.".".$field] =
-                            $this->formatMappingFieldLabel($relationship, $title);
-                    }
+        if ($includerelations && $has_ones = singleton($this->objectClass)->has_one()) {
+            foreach ($has_ones as $relationship => $type) {
+                $fields = $this->getMappableFieldsForClass($type);
+                foreach ($fields as $field => $title) {
+                    $map[$relationship.".".$field] =
+                        $this->formatMappingFieldLabel($relationship, $title);
                 }
             }
         }
@@ -565,7 +584,7 @@ class BetterBulkLoader extends BulkLoader
     {
         $singleton = singleton($class);
         $fields = (array)$singleton->fieldLabels(false);
-        foreach ($fields as $field => $label) {
+        foreach (array_keys($fields) as $field) {
             if (!$singleton->db($field)) {
                 unset($fields[$field]);
             }

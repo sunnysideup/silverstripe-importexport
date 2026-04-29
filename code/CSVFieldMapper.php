@@ -41,9 +41,10 @@ class CSVFieldMapper extends CSVPreviewer
     public function getMapHeadings()
     {
         if (!$this->headings && !$this->mappablecols) {
-            return;
+            return null;
         }
-        $out = new ArrayList();
+
+        $out = ArrayList::create();
         foreach ($this->headings as $heading) {
             $dropdown = $this->createHeadingDropdown($heading);
             if (is_array($this->mappingvalues) &&
@@ -51,10 +52,11 @@ class CSVFieldMapper extends CSVPreviewer
             ) {
                 $dropdown->setValue($this->mappingvalues[$heading]);
             }
-            $out->push(new ArrayData(array(
+
+            $out->push(ArrayData::create([
                 "Heading" => $heading,
                 "Dropdown" => $dropdown
-            )));
+            ]));
         }
 
         return $out;

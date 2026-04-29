@@ -21,12 +21,6 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
 {
 
     /**
-     * Fragment to write the button to
-     * @var string
-     */
-    protected $targetFragment;
-
-    /**
      * The BulkLoader to load with
      * @var string
      */
@@ -38,9 +32,16 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
      */
     protected $canClearData = true;
 
-    public function __construct($targetFragment = "after")
+    /**
+     * @param string $targetFragment
+     */
+    public function __construct(
+        /**
+         * Fragment to write the button to
+         */
+        protected $targetFragment = "after"
+    )
     {
-        $this->targetFragment = $targetFragment;
     }
 
     /**
@@ -107,27 +108,22 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
      */
     public function getHTMLFragments($gridField)
     {
-        $button = new GridField_FormAction(
-            $gridField,
-            'import',
-            _t('TableListField.CSVIMPORT', 'Import from CSV'),
-            'import',
-            null
-        );
+        $button = GridField_FormAction::create($gridField, 'import', _t('TableListField.CSVIMPORT', 'Import from CSV'), 'import', null);
         $button->setAttribute('data-icon', 'drive-upload');
         $button->addExtraClass('no-ajax');
+
         $uploadfield = $this->getUploadField($gridField);
-        $data = array(
+        $data = [
             'Button' => $button,
             'UploadField' => $uploadfield
-        );
+        ];
         $importerHTML = ArrayData::create($data)
                     ->renderWith("GridFieldImporter");
         Requirements::javascript('burnbright/silverstripe-importexport: javascript/GridFieldImporter.js');
 
-        return array(
+        return [
             $this->targetFragment => $importerHTML
-        );
+        ];
     }
 
     /**
@@ -149,7 +145,7 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
             ->setAttribute('canPreviewFolder', false)
             ->setAttribute('canAttachExisting', false)
             ->setAttribute('overwriteWarning', false)
-            ->setAllowedExtensions(array('csv'))
+            ->setAllowedExtensions(['csv'])
             ->setFolderName('csvImports') //TODO: don't store temp CSV in assets
             ->addExtraClass("import-upload-csv-field");
 
@@ -158,14 +154,14 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
 
     public function getActions($gridField)
     {
-        return array('importer');
+        return ['importer'];
     }
 
     public function getURLHandlers($gridField)
     {
-        return array(
+        return [
             'importer' => 'handleImporter'
-        );
+        ];
     }
 
     /**
@@ -174,8 +170,8 @@ class GridFieldImporter implements GridField_HTMLProvider, GridField_URLHandler
     public function handleImporter($gridField, $request = null)
     {
         $controller = $gridField->getForm()->getController();
-        $handler    = new GridFieldImporter_Request($gridField, $this, $controller);
+        $handler    = GridFieldImporter_Request::create($gridField, $this, $controller);
 
-        return $handler->handleRequest($request, DataModel::inst());
+        return $handler->handleRequest($request);
     }
 }

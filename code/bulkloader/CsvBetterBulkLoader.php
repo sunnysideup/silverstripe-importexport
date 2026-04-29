@@ -13,7 +13,9 @@ class CsvBetterBulkLoader extends BetterBulkLoader
 {
 
     public $delimiter = ',';
+
     public $enclosure = '"';
+
     public $hasHeaderRow = true;
 
     protected function processAll($filepath, $preview = false)
