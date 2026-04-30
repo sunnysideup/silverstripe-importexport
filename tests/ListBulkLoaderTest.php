@@ -9,36 +9,32 @@ use SilverStripe\ORM\DataObject;
 class ListBulkLoaderTest extends SapphireTest
 {
 
-    protected $extraDataObjects = array(
+    protected $extraDataObjects = [
         'ListBulkLoaderTest_Person'
-    );
+    ];
 
     public function testImport()
     {
-        $parent = new ListBulkLoaderTest_Person(
-            array("Name" => "George", "Age" => 55)
-        );
+        $parent = \ListBulkLoaderTest_Person::create(["Name" => "George", "Age" => 55]);
         $parent->write();
 
         //add one existing child
-        $existingchild = new ListBulkLoaderTest_Person(
-            array("Name" => "Xavier", "Age" => 13)
-        );
+        $existingchild = \ListBulkLoaderTest_Person::create(["Name" => "Xavier", "Age" => 13]);
         $existingchild->write();
         $parent->Children()->add($existingchild);
 
-        $loader = new ListBulkLoader($parent->Children());
-        $loader->duplicateChecks = array(
+        $loader = ListBulkLoader::create($parent->Children());
+        $loader->duplicateChecks = [
             "Name"
-        );
+        ];
 
-        $source = new ArrayBulkLoaderSource(array(
-            array(), //skip record
-            array("Name" => "Martha", "Age" => 1), //new record
-            array("Name" => "Xavier", "Age" => 16), //update record
-            array("Name" => "Joanna", "Age" => 3), //new record
+        $source = new ArrayBulkLoaderSource([
+            [], //skip record
+            ["Name" => "Martha", "Age" => 1], //new record
+            ["Name" => "Xavier", "Age" => 16], //update record
+            ["Name" => "Joanna", "Age" => 3], //new record
             "" //skip record
-        ));
+        ]);
         $loader->setSource($source);
         $result = $loader->load();
         $this->assertEquals(2, $result->SkippedCount(), "Records skipped");
@@ -49,7 +45,7 @@ class ListBulkLoaderTest extends SapphireTest
         $this->assertEquals(3, $parent->Children()->count(), "Parent has 3 children");
     }
 
-    public function testDeleteExisting()
+    public function testDeleteExisting(): never
     {
         $this->markTestIncomplete("test deletion");
 
@@ -61,16 +57,18 @@ class ListBulkLoaderTest extends SapphireTest
 class ListBulkLoaderTest_Person extends DataObject implements TestOnly
 {
 
-    private static $db = array(
+    private static $table_name = 'ListBulkLoaderTest_Person';
+
+    private static $db = [
         "Name" => "Varchar",
         "Age" => "Int"
-    );
+    ];
 
-    private static $has_one = array(
+    private static $has_one = [
         "Parent" => "ListBulkLoaderTest_Person"
-    );
+    ];
 
-    private static $has_many = array(
+    private static $has_many = [
         "Children" => "ListBulkLoaderTest_Person"
-    );
+    ];
 }
